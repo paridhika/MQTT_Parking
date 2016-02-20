@@ -179,7 +179,7 @@ hnd_put_location(coap_context_t  *ctx, struct coap_resource_t *resource,
 
   coap_get_data(request, &size, &data);
   char *location = (char *)data;
-  printf("%s\n",location);
+ // printf("%s\n",location);
   unsigned char buf[3];
 
   response->hdr->code = COAP_RESPONSE_CODE(205);
@@ -450,7 +450,7 @@ void
 init_resources(coap_context_t *ctx) {
   coap_resource_t *r;
   initialize_map();
-  print_map();
+ // print_map();
 
   r = coap_resource_init(NULL, 0, 0);
   coap_register_handler(r, COAP_REQUEST_GET, hnd_get_index);
