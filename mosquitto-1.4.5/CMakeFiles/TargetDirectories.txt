@@ -1,0 +1,6 @@
+/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/lib/CMakeFiles/libmosquitto.dir
+/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/src/CMakeFiles/mosquitto.dir
+/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/src/CMakeFiles/mosquitto_passwd.dir
+/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/client/CMakeFiles/mosquitto_pub.dir
+/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/client/CMakeFiles/mosquitto_sub.dir
+/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/lib/cpp/CMakeFiles/mosquittopp.dir

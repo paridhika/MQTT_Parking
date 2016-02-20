@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/src/mosquitto_passwd.c
+errno.h
+-
+openssl/evp.h
+-
+openssl/rand.h
+-
+openssl/buffer.h
+-
+signal.h
+-
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+process.h
+-
+io.h
+-
+stdbool.h
+-
+unistd.h
+-
+termios.h
+-
+

@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC    -shared -Wl,-soname,libmosquittopp.so.1 -o libmosquittopp.so.1.4.5 CMakeFiles/mosquittopp.dir/mosquittopp.cpp.o  -L/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/lib ../libmosquitto.so.1.4.5 -lssl -lcrypto -lpthread -lrt -lcares -Wl,-rpath,/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/lib: 

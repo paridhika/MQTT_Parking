@@ -1,0 +1,1 @@
+/usr/bin/cc      CMakeFiles/mosquitto_sub.dir/sub_client.c.o CMakeFiles/mosquitto_sub.dir/client_shared.c.o  -o mosquitto_sub  -L/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/lib -rdynamic ../lib/libmosquitto.so.1.4.5 -lssl -lcrypto -lpthread -lrt -lcares -Wl,-rpath,/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/lib: 

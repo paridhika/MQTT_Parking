@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/lib/cpp/mosquittopp.cpp
+cstdlib
+-
+mosquitto.h
+-
+mosquittopp.h
+-
+
+lib/cpp/mosquittopp.h
+cstdlib
+-
+time.h
+-
+mosquitto.h
+-
+
+lib/mosquitto.h
+stdbool.h
+-
+
