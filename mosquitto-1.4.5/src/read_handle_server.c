@@ -590,9 +590,9 @@ int mqtt3_handle_disconnect(struct mosquitto_db *db, struct mosquitto *context)
 	context->state = mosq_cs_disconnecting;
 	do_disconnect(db, context);
 	//Paridhika
-	struct timeval end;
+	/*struct timeval end;
 	gettimeofday(&end, NULL);
-	fprintf(fp, "D=%lld\n",end.tv_sec*1000000 + end.tv_usec);
+	fprintf(fp, "D=%lld\n",end.tv_sec*1000000 + end.tv_usec);*/
 //	pthread_mutex_unlock(&fp_mutex);
 	return MOSQ_ERR_SUCCESS;
 }

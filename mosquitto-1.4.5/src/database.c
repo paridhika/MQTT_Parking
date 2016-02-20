@@ -136,7 +136,7 @@ int mqtt3_db_close(struct mosquitto_db *db)
 
 void initialize_map() {
 	int i,j;
-	fp = fopen("put_delete_time.csv","w+");
+//	fp = fopen("put_delete_time.csv","w+");
 	my_map = (struct parking **)malloc(sizeof(struct parking *) * SIZE);
 	for (i = 0; i < SIZE; ++i){
 		my_map[i] = (struct parking *)malloc(SIZE * sizeof(struct parking));

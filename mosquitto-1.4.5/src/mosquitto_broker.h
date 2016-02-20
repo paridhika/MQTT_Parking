@@ -341,8 +341,8 @@ struct parking {
 
 struct parking **my_map;
 pthread_mutex_t my_map_mutex;
-FILE *fp;
-pthread_mutex_t fp_mutex;
+/*FILE *fp;
+pthread_mutex_t fp_mutex;*/
 #include <net_mosq.h>
 
 /* ============================================================

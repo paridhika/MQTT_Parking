@@ -26,10 +26,10 @@ int _mosquitto_send_connack(struct mosquitto *context, int ack, int result)
 	struct _mosquitto_packet *packet = NULL;
 	int rc;
 	//Paridhika
-	struct timeval start;
+	/*struct timeval start;
 	gettimeofday(&start, NULL);
 //	pthread_mutex_lock(&fp_mutex);
-	fprintf(fp, "C=%lld,",start.tv_sec*1000000 + start.tv_usec);
+	fprintf(fp, "C=%lld,",start.tv_sec*1000000 + start.tv_usec);*/
 
 	if(context){
 		if(context->id){

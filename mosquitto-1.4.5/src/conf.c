@@ -304,7 +304,7 @@ void mqtt3_config_cleanup(struct mqtt3_config *config)
 		config->log_file = NULL;
 	}
 	//Paridhika
-	fclose(fp);
+//	fclose(fp);
 }
 
 static void print_usage(void)
