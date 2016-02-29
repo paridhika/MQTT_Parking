@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 {
 	//Paridhika
 	initialize_map();
-
+	initialize_lights();
 	mosq_sock_t *listensock = NULL;
 	int listensock_count = 0;
 	int listensock_index = 0;

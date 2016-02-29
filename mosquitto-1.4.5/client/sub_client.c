@@ -35,7 +35,8 @@ int msg_count = 0;
 
 void my_message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
 {
-	mosquitto_disconnect(mosq);
+	if(strstr(message->topic,"loc"))
+		mosquitto_disconnect(mosq);
 	struct mosq_config *cfg;
 	int i;
 	bool res;

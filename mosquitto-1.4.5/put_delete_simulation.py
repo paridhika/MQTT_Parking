@@ -5,31 +5,48 @@ import random
 import threading
 import csv
 import subprocess
-from array import array
+from Queue import Queue
 # thread class to run a command
 class ExampleThread(threading.Thread):
-	def __init__(self, state,start_time,sumarray):
+	def __init__(self,threads,count,sumarray):
 		threading.Thread.__init__(self)
-		self.state = state
-		self.start_time = start_time
+#	self.threads = threads
+		self.count = count
 		self.sumarray = sumarray
 	def run(self):
-		p = subprocess.Popen(self.state, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    		while(True):
-			if(p.poll() != None):
-				end = time.time()
-#				print end - self.start_time
-				self.sumarray.append(end - self.start_time)
-				break;
+		while(self.count!=0):
+			while(threads.empty() == False):
+				process = threads.get()
+				self.count -= 1
+				p = subprocess.Popen(process.state, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+	 			while(True):
+		    			for line in p.stdout:
+						print line
+	    				if(p.poll() != None):
+						end = time.time()
+#						print "Execution = " + str(end - process.start_time)
+			    			self.sumarray.append(end - process.start_time)
+						break;
 
-mean = 10
-count = 10
+class ProcessStore():
+	def __init__(self,state,start_time):
+		self.state = state
+		self.start_time = start_time
+
+mean = 1
+count = 50
+
 f = open('put_delete_simulation_results.csv', 'wt')
+f1 = open('put_delete_simulation_service_time.csv', 'wt')
 writer = csv.writer(f)
 writer.writerow( ('Arrival Rate', 'Service Time','Throughput') )
-while(mean < 1000000):
+service = csv.writer(f1)
+service.writerow( ('Mean', 'Count', 'Service Time') )
+while(mean < 100):
 	sumarray = []
-	threads = []
+	threads = Queue()
+	thread = ExampleThread(threads, count, sumarray)
+	thread.start()
 	sum = 0.0;
 	for index in range(0,count):
 		wait = random.expovariate(mean)
@@ -42,16 +59,17 @@ while(mean < 1000000):
                 else:
                         state = "xterm -e ./client/mosquitto_pub -t 'loc/put' -m {0},{1} &".format(ip,port)
 		start_time = time.time()
-		thread = ExampleThread(state, start_time, sumarray)
-		threads.append(thread)
-	    	thread.start()
-		time.sleep(wait);
-	for t in threads:
-		t.join();
+		process = ProcessStore(state, start_time)
+	        threads.put(process)
+	        time.sleep(wait);
+	thread.join();
+	i = 1
 	for val in sumarray:
-		sum += val;
-	writer.writerow((mean ,sum/count, (int)(count/sum)))
+		service.writerow((mean , i, val))
+		i += 1
+		sum += val
+#	print "sum = " + str(sum) + "count = " + str(count)
+	writer.writerow((mean , sum/count, (int)(count*3600/sum)))
 	mean *= 2
-#	print mean
 f.close()
 

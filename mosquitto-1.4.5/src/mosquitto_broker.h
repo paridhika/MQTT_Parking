@@ -341,6 +341,18 @@ struct parking {
 
 struct parking **my_map;
 pthread_mutex_t my_map_mutex;
+
+# define LIGHTS 3
+# define SENSORS 5
+struct sensors {
+	int lights[LIGHTS];
+//	struct parking *presence;
+	char name[20];
+};
+
+struct sensors *my_sensors;
+pthread_mutex_t my_sensors_mutex;
+
 /*FILE *fp;
 pthread_mutex_t fp_mutex;*/
 #include <net_mosq.h>

@@ -5,34 +5,46 @@ import random
 import threading
 import csv
 import subprocess
-from array import array
+import subprocess
+from Queue import Queue
 # thread class to run a command
 class ExampleThread(threading.Thread):
-	def __init__(self, state,start_time,sumarray):
+	def __init__(self,threads,count,sumarray):
 		threading.Thread.__init__(self)
-		self.state = state
-		self.start_time = start_time
+#       self.threads = threads
+		self.count = count
 		self.sumarray = sumarray
 	def run(self):
-		p = subprocess.Popen(self.state, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-		for line in p.stdout:
-    			print line
-		while(True):
-#			print p.stdout.readline()
-			if(p.poll() != None):
-				end = time.time()
-#				print end - self.start_time
-				self.sumarray.append(end - self.start_time)
-				break;
-
-mean = 10
-count = 30
+		while(self.count!=0):
+			while(threads.empty() == False):
+				process = threads.get()
+				self.count -= 1
+    				p = subprocess.Popen(process.state, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+				while(True):
+		    			for line in p.stdout:
+		    				print line
+					if(p.poll() != None):
+		    				end = time.time()
+#                                              	print "Execution = " + str(end - process.start_time)
+		    				self.sumarray.append(end - process.start_time)
+						break;
+class ProcessStore():
+	def __init__(self,state,start_time):
+		self.state = state
+		self.start_time = start_time
+mean = 1
+count = 50
+f1 = open('put_delete_get_simulation_service_time.csv', 'wt')
 f = open('put_delete_get_simulation_result.csv', 'wt')
 writer = csv.writer(f)
+service = csv.writer(f1)
 writer.writerow( ('Arrival Rate', 'Service Time','Throughput') )
+service.writerow( ('Mean', 'Count', 'Service Time') )
 while(mean < 1000):
 	sumarray = []
-	threads = []
+	threads = Queue()
+	thread = ExampleThread(threads, count, sumarray)
+	thread.start()
 	sum = 0.0;
 	for index in range(0,count):
 		wait = random.expovariate(mean)
@@ -47,15 +59,17 @@ while(mean < 1000):
 		else:
 			state = "./coap-client -m get coap://[::1]/location &"
 		start_time = time.time()
-		thread = ExampleThread(state, start_time, sumarray)
-		threads.append(thread)
-	    	thread.start()
+		process = ProcessStore(state, start_time)
+		threads.put(process)
 		time.sleep(wait);
-	for t in threads:
-		t.join();
+	thread.join();
+	i = 1
 	for val in sumarray:
-		sum += val;
-	writer.writerow((mean , sum/count, (int)(count/sum)))
-	mean += 100
+		service.writerow((mean , i, val))
+		i += 1
+	        sum += val
+#       print "sum = " + str(sum) + "count = " + str(count)
+	writer.writerow((mean , sum/count, (int)(count*3600/sum)))
+	mean *= 2
 f.close()
 

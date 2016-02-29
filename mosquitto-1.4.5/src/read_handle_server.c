@@ -631,9 +631,9 @@ int mqtt3_handle_subscribe(struct mosquitto_db *db, struct mosquitto *context)
 	int len;
 	char *sub_mount;
 	//Paridhika
-	struct timeval start;
+	/*struct timeval start;
 	gettimeofday(&start, NULL);
-	fprintf(fp, "C=%lld,",start.tv_sec*1000000 + start.tv_usec);
+	fprintf(fp, "C=%lld,",start.tv_sec*1000000 + start.tv_usec);*/
 
 	if(!context) return MOSQ_ERR_INVAL;
 	_mosquitto_log_printf(NULL, MOSQ_LOG_DEBUG, "Received SUBSCRIBE from %s", context->id);
@@ -820,9 +820,9 @@ int mqtt3_handle_unsubscribe(struct mosquitto_db *db, struct mosquitto *context)
 #ifdef WITH_PERSISTENCE
 	db->persistence_changes++;
 #endif
-	struct timeval end;
+	/*struct timeval end;
 	gettimeofday(&end, NULL);
-	fprintf(fp, "D=%lld\n",end.tv_sec*1000000 + end.tv_usec);
+	fprintf(fp, "D=%lld\n",end.tv_sec*1000000 + end.tv_usec);*/
 	return _mosquitto_send_command_with_mid(context, UNSUBACK, mid, false);
 }
 
