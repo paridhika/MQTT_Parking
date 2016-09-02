@@ -6,28 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/client/client_shared.c
-errno.h
--
-fcntl.h
--
-stdio.h
--
-stdlib.h
--
-string.h
--
-unistd.h
--
-process.h
--
-winsock2.h
--
-mosquitto.h
--
-client_shared.h
-/home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/client/client_shared.h
-
 /home/paridhika/Downloads/IoT/MQTT/mosquitto-1.4.5/client/client_shared.h
 stdio.h
 -

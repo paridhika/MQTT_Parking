@@ -136,26 +136,11 @@ int mqtt3_db_close(struct mosquitto_db *db)
 
 void initialize_map() {
 	int i,j;
-//	fp = fopen("put_delete_time.csv","w+");
 	my_map = (struct parking **)malloc(sizeof(struct parking *) * SIZE);
 	for (i = 0; i < SIZE; ++i){
 		my_map[i] = (struct parking *)malloc(SIZE * sizeof(struct parking));
-		for (j=0; j < SIZE; j++)
-			strcpy(my_map[i][j].ip_address,"");
-			strcpy(my_map[i][j].port,"");
-	}
-}
-
-void print_map() {
-	int i,j;
-	for(i=0;i<SIZE;i++) {
-		for(j=0;j<SIZE;j++) {
-			if(strcmp(my_map[i][j].ip_address,"")) {
-				printf("%s:%s |",my_map[i][j].ip_address,my_map[i][j].port);
-			}
-			else printf("Empty | ");
-		}
-		printf("\n");
+		for (j = 0; j < SIZE; j++)
+			strcpy(my_map[i][j].status,"EMPTY");
 	}
 }
 
@@ -165,26 +150,11 @@ void find_location(char **temp) {
 	char str2[100];
 	for(i = 0; i < SIZE; i++) {
 		for(j = 0; j < SIZE; j++){
-			if(strcmp(my_map[i][j].ip_address,"") == 0){
+			if(strcmp(my_map[i][j].status,"EMPTY") == 0){
 				sprintf(str1,"%d",i);
 				sprintf(str2,"%d",j);
-		//		printf("new payload = %s\n",strcat(strcat(str1 , ",") , str2));
 				*temp = strcat(strcat(str1 , ",") , str2);
-				return;
-			}
-		}
-	}
-	*temp = "";
-}
-
-
-void delete_location() {
-	int i,j;
-	for(i = 0; i < SIZE; i++) {
-		for(j = 0; j < SIZE; j++){
-			if(strcmp(my_map[i][j].ip_address,"") != 0) {
-				strcpy(my_map[i][j].ip_address,"");
-				strcpy(my_map[i][j].port,"");
+				strcpy(my_map[i][j].status,"OCCUPIED");
 				return;
 			}
 		}
@@ -193,26 +163,30 @@ void delete_location() {
 
 
 void put_location(char *loc) {
-	int i,j;
-	char * ip = strtok(loc,",");
-	char * port = strtok(NULL,",");
-	if(strcmp(my_map[i][j].ip_address,"") == 0) {
-		strcpy(my_map[i][j].ip_address,ip);
-		strcpy(my_map[i][j].port ,port);
+	char * x = strtok(loc,",");
+	char * y = strtok(NULL,",");
+	int i = atoi(x), j = atoi(y);
+	if(strcmp(my_map[i][j].status,"EMPTY") == 0){
+		strcpy(my_map[i][j].status,"OCCUPIED");
 	}
 }
-void find_put_location(char *loc) {
+
+void delete_location(char *loc) {
+	char * x = strtok(loc,",");
+	char * y = strtok(NULL,",");
+	int i = atoi(x), j = atoi(y);
+	if(strcmp(my_map[i][j].status,"OCCUPIED") == 0){
+		strcpy(my_map[i][j].status,"EMPTY");
+	}
+}
+
+void print_map() {
 	int i,j;
-	for(i = 0; i < SIZE; i++) {
-		for(j = 0; j < SIZE; j++){
-			if(strcmp(my_map[i][j].ip_address,"") == 0){
-				char * ip = strtok(loc,",");
-				char * port = strtok(NULL,",");
-				strcpy(my_map[i][j].ip_address,ip);
-				strcpy(my_map[i][j].port,port);
-				return;
-			}
+	for(i=0;i<SIZE;i++) {
+		for(j=0;j<SIZE;j++) {
+			printf("%s|",my_map[i][j].status);
 		}
+		printf("\n");
 	}
 }
 
@@ -665,25 +639,25 @@ int mqtt3_db_message_store(struct mosquitto_db *db, const char *source, uint16_t
 
 		    if(strcmp(topic,"loc/put") == 0){
 		    	pthread_mutex_lock(&my_map_mutex);
-		    	find_put_location(payload);
-		  //  	print_map();
+		    	put_location(payload);
 		    	pthread_mutex_unlock(&my_map_mutex);
+		    	memcpy(temp->payload, payload, sizeof(char)*payloadlen);
 		    }
 		    else if(strcmp(topic,"loc/delete") == 0){
 		    	pthread_mutex_lock(&my_map_mutex);
-		    	delete_location();
-		  //  	print_map();
+		    	delete_location(payload);
 		    	pthread_mutex_unlock(&my_map_mutex);
+		    	memcpy(temp->payload, payload, sizeof(char)*payloadlen);
 		    }
 		    else if(strcmp(topic,"loc/get") == 0){
-		    	pthread_mutex_lock(&my_map_mutex);
 		    	char *new_payload = (char *)malloc(3*sizeof(char));
-		    	find_location(&new_payload);
-				payloadlen = strlen(new_payload);
-				temp->payloadlen = payloadlen;
-				memcpy(temp->payload, new_payload, sizeof(char)*payloadlen);
-			//	print_map();
+		    	pthread_mutex_lock(&my_map_mutex);
+		    	//find_location(&new_payload);
+		    	put_location(payload);
 				pthread_mutex_unlock(&my_map_mutex);
+				payloadlen = strlen(payload);
+				temp->payloadlen = payloadlen;
+				memcpy(temp->payload, payload, sizeof(char)*payloadlen);
 		    }
 		else {
 			memcpy(temp->payload, payload, sizeof(char)*payloadlen);

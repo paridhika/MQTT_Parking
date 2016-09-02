@@ -333,28 +333,15 @@ struct libws_mqtt_data {
 
 //Paridhika
 
-# define SIZE 10
+#define SIZE 10
+
 struct parking {
-	char ip_address[20];
-	char port[5];
+	char status[20];
 };
 
 struct parking **my_map;
 pthread_mutex_t my_map_mutex;
 
-# define LIGHTS 3
-# define SENSORS 5
-struct sensors {
-	int lights[LIGHTS];
-//	struct parking *presence;
-	char name[20];
-};
-
-struct sensors *my_sensors;
-pthread_mutex_t my_sensors_mutex;
-
-/*FILE *fp;
-pthread_mutex_t fp_mutex;*/
 #include <net_mosq.h>
 
 /* ============================================================
@@ -442,9 +429,8 @@ void mqtt3_db_vacuum(void);
 void print_map();
 void initialize_map();
 void find_location(char **temp);
-void delete_location();
+void delete_location(char *loc);
 void put_location(char *loc);
-void find_put_location(char *loc);
 /* ============================================================
  * Subscription functions
  * ============================================================ */
