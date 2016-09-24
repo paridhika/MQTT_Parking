@@ -46,6 +46,8 @@ $ make
 
 $ sudo make install
 
+$ adduser mosquitto
+
 $ mosquitto
 ### Running client
 
