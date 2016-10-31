@@ -11,7 +11,7 @@ Traffic coming to the server follows the poisson arrival.
 * mosquitto.c
 * mosquitto_broker.h
 
-Files Location:- MQTT/mosquitto/src
+Files Location:- MQTT_Parking/mosquitto/src
 ### Client side changes:- 
 A python script is run to send multiple requests.
 The system runs of 3 types of clients corresponding to 3 request types.
