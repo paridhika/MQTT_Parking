@@ -9,32 +9,31 @@ import subprocess
 from Queue import Queue
 from collections import OrderedDict
 from sets import Set
-# thread class to run a command
-class ExampleThread(threading.Thread):
-	def __init__(self,threads,count,sumarray,mean_hold):
+import os
+# thread class to run a command	
+						
+class ProcessThread(threading.Thread):
+	def __init__(self,process,sumarray,mean_hold):
 		threading.Thread.__init__(self)
-		self.threads = threads
-		self.count = count
+		self.process = process
 		self.sumarray = sumarray
 		self.mean_hold = mean_hold
-	def run(self):
-		while(self.count!=0):
-			while(self.threads.empty() == False):
-				process = self.threads.get()
-				self.count -= 1
-    				p = subprocess.Popen(process.state1, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-				if(process.state2 != None):
-					q = subprocess.Popen(process.state2, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-				while(True):
-					if(p.poll() != None and process.state2 == None):
-		    				end = time.time()
-		    				self.sumarray.append(end - process.start_time)
-						break;
-					elif(p.poll() != None and process.state2 != None and q.poll() != None ):
-						end = time.time()
-						self.sumarray.append(end - process.start_time)
-						break;		
-						
+	def run(self):	
+		p = subprocess.Popen(self.process.state1, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, preexec_fn=os.setsid)
+		if(self.process.state2 != None):
+			q = subprocess.Popen(self.process.state2, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, preexec_fn=os.setsid)
+		while(True):
+			if(p.poll() != None and self.process.state2 == None):
+				end = time.time()
+				self.sumarray.append(end - self.process.start_time)
+				break;
+			elif(p.poll() != None and self.process.state2 != None and q.poll() != None ):
+				end = time.time()
+				self.sumarray.append(end - self.process.start_time)
+				break;		
+			
+
+
 
 class PutClientThread(threading.Thread):
 	def __init__(self,put_mean,mean_hold,count):
@@ -56,8 +55,6 @@ class PutClientThread(threading.Thread):
 		service.writerow( ('Mean', 'Count', 'Service Time') )
 		sumarray = []
 		threads = Queue()
-		thread = ExampleThread(threads, self.count, sumarray,self.mean_hold)
-		thread.start()
 		sum = 0.0;
 		for index in range(0,self.count):
 			wait = random.expovariate(self.put_mean)
@@ -68,9 +65,12 @@ class PutClientThread(threading.Thread):
 			state = "xterm -e ./client/mosquitto_pub -t 'loc/put' -m {0} &".format(location)
 			start_time = time.time()
 			process = ProcessStore(state, None, start_time)
-			threads.put(process)
-			time.sleep(wait);
-		thread.join();
+			thread = ProcessThread(process, sumarray,self.mean_hold)
+			thread.start()
+			threads.put(thread)
+			time.sleep(wait)
+		while not threads.empty():
+			threads.get().join()
 		i = 1
 		for val in sumarray:
 			service.writerow((self.put_mean , i, val))
@@ -100,22 +100,25 @@ class GetClientThread(threading.Thread):
 		service.writerow( ('Mean', 'Count', 'Service Time') )
 		sumarray = []
 		threads = Queue()
-		thread = ExampleThread(threads, self.count, sumarray,self.mean_hold)
-		thread.start()
 		sum = 0.0;
 		for index in range(0,self.count):
 			wait = random.expovariate(self.get_mean)
 			lockobj.acquire()
-			location = empty_slotsset.pop()
+			if len(empty_slotsset) != 0:
+				location = empty_slotsset.pop()
+			else: location = "0,0"
 			self.store_time(location)
 			lockobj.release()
-			state1 = "(./client/mosquitto_sub -t 'loc/get' &)"
+			state1 = "(./client/mosquitto_sub -C 1 -t 'loc/get' &)"
 			state2 = "(xterm -e ./client/mosquitto_pub -t 'loc/get' -m {0} &)".format(location)
 			start_time = time.time()
 			process = ProcessStore(state1, state2, start_time)
-			threads.put(process)
-			time.sleep(wait);
-		thread.join();
+			thread = ProcessThread(process, sumarray,self.mean_hold)
+			thread.start()
+			threads.put(thread)
+			time.sleep(wait)
+		while not threads.empty():
+			threads.get().join()
 		i = 1
 		for val in sumarray:
 			service.writerow((self.get_mean , i, val))
@@ -141,30 +144,37 @@ class DeleteClientThread(threading.Thread):
 		arrival_interval = []	#array to store interarrival times of delete processes
 		arrival_start = time.time()
 		threads = Queue()
-		thread = ExampleThread(threads, self.count, sumarray,self.mean_hold)
-		thread.start()
 		sum = 0.0
 		delete_mean = 0.0		#variable to calculate mean interarrival time of delete
 		temp_count = self.count
-		while(temp_count !=0):
-			if any(filled_slotsdict):
-				sorted_dict = OrderedDict(sorted(filled_slotsdict.items(), key=lambda t: t[1]))
-				location,kill_time = sorted_dict.items()[0]
-				if kill_time <= time.time():
-					arrival_interval.append(kill_time - arrival_start)
-					delete_mean += kill_time - arrival_start
-					arrival_start = kill_time
-					lockobj.acquire()
-					filled_slotsdict.pop(location)
-					empty_slotsset.add(location)
-					lockobj.release()
-					temp_count -= 1
-					print "delete at: " + location
-					state = "xterm -e ./client/mosquitto_pub -t 'loc/delete' -m {0} &".format(location)
-					start_time = time.time()
-					process = ProcessStore(state, None, start_time)
-					threads.put(process)
-		thread.join();
+		for index in range(0,self.count):
+			while any(filled_slotsdict) == False: 
+				#print "empty" + str(index) +" " + str(self.count)
+				if index >= self.count:
+					break
+				pass
+			sorted_dict = OrderedDict(sorted(filled_slotsdict.items(), key=lambda t: t[1]))
+			location,kill_time = sorted_dict.items()[0]
+			while kill_time > time.time():
+				#print "wait" + str(index)
+				pass
+			arrival_interval.append(kill_time - arrival_start)
+			delete_mean += kill_time - arrival_start
+			arrival_start = kill_time
+			lockobj.acquire()
+			filled_slotsdict.pop(location)
+			empty_slotsset.add(location)
+			lockobj.release()
+			temp_count -= 1
+			print "delete at: " + location
+			state = "xterm -e ./client/mosquitto_pub -t 'loc/delete' -m {0} &".format(location)
+			start_time = time.time()
+			process = ProcessStore(state, None, start_time)
+			thread = ProcessThread(process, sumarray,self.mean_hold)
+			thread.start()
+			threads.put(thread)
+		while not threads.empty():
+			threads.get().join()
 		i = 1
 		delete_mean /= self.count
 		for val in sumarray:
@@ -182,9 +192,9 @@ class ProcessStore():
 		self.start_time = start_time
 
 def initEmptySet(empty_slotsset):
-	size=10
-	for i in range(10):
-		for j in range(10):
+	size=100
+	for i in range(size):
+		for j in range(size):
 			empty_slotsset.add(str(i)+","+str(j))
 
 empty_slotsset = set()
@@ -193,14 +203,14 @@ initEmptySet(empty_slotsset)
 lockobj = threading.Lock()
 put_mean = 1
 get_mean = 1
-mean_hold = 0.8
-count = 10
+mean_hold = 1
+count = 1
 put_thread = PutClientThread(put_mean,mean_hold,count)
 put_thread.start()
+put_thread.join()
 get_thread = GetClientThread(get_mean,mean_hold,count)
 get_thread.start()
+get_thread.join()
 delete_thread = DeleteClientThread(mean_hold,2*count)
 delete_thread.start()
-put_thread.join()
 delete_thread.join()
-get_thread.join()

@@ -342,7 +342,7 @@ struct _mqtt3_bridge{
 #endif
 };
 //Paridhika
-#define SIZE 10
+#define SIZE 100
 
 struct parking {
 	char status[20];
