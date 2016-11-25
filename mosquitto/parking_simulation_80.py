@@ -201,9 +201,9 @@ empty_slotsset = set()
 filled_slotsdict = OrderedDict()
 initEmptySet(empty_slotsset)
 lockobj = threading.Lock()
-put_mean = 21
-get_mean = 189
-mean_hold = 0.3
+put_mean = 150.999999
+get_mean = 150.899999
+mean_hold = 0.1
 count = 1000
 put_thread = PutClientThread(put_mean,mean_hold,count)
 put_thread.start()
