@@ -199,8 +199,8 @@ empty_slotsset = set()
 filled_slotsdict = OrderedDict()
 initEmptySet(empty_slotsset)
 lockobj = threading.Lock()
-put_mean = 75.39999
-get_mean = 75.49999
+put_mean = 50
+get_mean = 50
 mean_hold = 0.1
 count = 1000
 put_thread = PutClientThread(put_mean,mean_hold,count)

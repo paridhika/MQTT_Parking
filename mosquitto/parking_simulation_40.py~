@@ -1,4 +1,4 @@
-#!/usr/bin/python
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																								#!/usr/bin/python
 import time
 import datetime
 import random
@@ -47,8 +47,8 @@ class PutClientThread(threading.Thread):
 		filled_slotsdict[location] = time.time() + wait
 		
 	def run(self):
-		f1 = open('Results/run1/80/put_simulation_service_time_80_run1.csv', 'wt')
-		f = open('Results/run1/80/put_simulation_result_80_run1.csv', 'wt')
+		f1 = open('Results/run1/40/put_simulation_service_time_40_run1.csv', 'wt')
+		f = open('Results/run1/40/put_simulation_result_40_run1.csv', 'wt')
 		writer = csv.writer(f)
 		service = csv.writer(f1)
 		writer.writerow( ('Arrival Rate', 'Service Time','Throughput') )
@@ -92,8 +92,8 @@ class GetClientThread(threading.Thread):
 		filled_slotsdict[location] = time.time() + wait
 		
 	def run(self):
-		f1 = open('Results/run1/80/get_simulation_service_time_80_run1.csv', 'wt')
-		f = open('Results/run1/80/get_simulation_result_80_run1.csv', 'wt')
+		f1 = open('Results/run1/40/get_simulation_service_time_40_run1.csv', 'wt')
+		f = open('Results/run1/40/get_simulation_result_40_run1.csv', 'wt')
 		writer = csv.writer(f)
 		service = csv.writer(f1)
 		writer.writerow( ('Arrival Rate', 'Service Time','Throughput') )
@@ -134,8 +134,8 @@ class DeleteClientThread(threading.Thread):
 		self.mean_hold = mean_hold
 		self.count = count
 	def run(self):
-		f1 = open('Results/run1/80/delete_simulation_service_time_80_run1.csv', 'wt')
-		f = open('Results/run1/80/delete_simulation_result_80_run1.csv', 'wt')
+		f1 = open('Results/run1/40/delete_simulation_service_time_40_run1.csv', 'wt')
+		f = open('Results/run1/40/delete_simulation_result_40_run1.csv', 'wt')
 		writer = csv.writer(f)
 		service = csv.writer(f1)
 		writer.writerow( ('Arrival Rate', 'Service Time','Throughput') )
@@ -146,7 +146,6 @@ class DeleteClientThread(threading.Thread):
 		threads = Queue()
 		sum = 0.0
 		delete_mean = 0.0		#variable to calculate mean interarrival time of delete
-		temp_count = self.count
 		for index in range(0,self.count):
 			while any(filled_slotsdict) == False: 
 				#print "empty" + str(index) +" " + str(self.count)
@@ -165,7 +164,6 @@ class DeleteClientThread(threading.Thread):
 			filled_slotsdict.pop(location)
 			empty_slotsset.add(location)
 			lockobj.release()
-			temp_count -= 1
 			print "delete at: " + location
 			state = "xterm -e ./client/mosquitto_pub -t 'loc/delete' -m {0} &".format(location)
 			start_time = time.time()
@@ -201,8 +199,8 @@ empty_slotsset = set()
 filled_slotsdict = OrderedDict()
 initEmptySet(empty_slotsset)
 lockobj = threading.Lock()
-put_mean = 99.999999
-get_mean = 99.999999
+put_mean = 75.39999
+get_mean = 75.49999
 mean_hold = 0.1
 count = 1000
 put_thread = PutClientThread(put_mean,mean_hold,count)
